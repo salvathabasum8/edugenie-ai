@@ -1,0 +1,21 @@
+# Course Syllabus: Generative AI on Google Cloud
+
+## Module 1: Introduction to Large Language Models (LLMs)
+- Foundational Transformer architectures (Encoder-only, Decoder-only, Encoder-Decoder)
+- Tokenization, embeddings, and vector similarity
+- Self-attention mechanism and multi-head attention
+
+## Module 2: Prompt Engineering & Cognitive Framing
+- Zero-shot, Few-shot, and Chain-of-Thought (CoT) prompting
+- System instructions and role-based personas
+- Structuring outputs: JSON schemas, Bloom's Taxonomy cognitive scaffolding
+
+## Module 3: Google Gemini API & Multimodal Capabilities
+- Gemini 3.8 Flash, Flash-Lite, and Pro capabilities
+- Multimodal understanding: Text, Images, Video, Audio, and PDF Documents
+- Function Calling / Tool Use and Grounding with Google Search
+
+## Module 4: Retrieval-Augmented Generation (RAG) & Vector Stores
+- Semantic search using Google Vertex AI Embeddings
+- Vector databases (Cloud SQL PGVector, Vector Search)
+- Context window management and chunking strategies

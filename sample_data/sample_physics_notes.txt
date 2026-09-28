@@ -1,0 +1,15 @@
+# Special Relativity & Mass-Energy Equivalence: Study Excerpt
+
+## 1. Postulates of Special Relativity
+1. The Principle of Relativity: The laws of physics are identical in all inertial reference frames.
+2. The Constancy of the Speed of Light: The speed of light in vacuum (c ≈ 3.00 × 10^8 m/s) is constant for all observers regardless of the motion of the light source or observer.
+
+## 2. Time Dilation & Length Contraction
+- Lorentz Factor: γ = 1 / sqrt(1 - v^2 / c^2)
+- Time Dilation: Δt = γ * Δt_0 (moving clocks tick slower relative to a stationary observer).
+- Length Contraction: L = L_0 / γ (moving objects contract in the direction of motion).
+
+## 3. Relativistic Mass-Energy
+- E = mc^2 = γ * m_0 * c^2
+- Relativistic Momentum: p = γ * m_0 * v
+- Total Energy Relation: E^2 = (pc)^2 + (m_0 * c^2)^2
