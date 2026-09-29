@@ -28,12 +28,12 @@ DEFAULT_HOST = os.environ.get("HOST", "0.0.0.0")
 
 # Google Gemini API configuration
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
 FALLBACK_MODELS = [
-    "gemini-flash-latest",
+    "gemini-3.5-flash-lite",
     "gemini-3.1-flash-lite",
-    "gemini-3.5-flash",
     "gemini-3.8-flash",
+    "gemini-flash-latest",
     "gemini-pro-latest"
 ]
 

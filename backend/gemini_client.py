@@ -3,7 +3,10 @@ import json
 import re
 import urllib.request
 import urllib.error
+import warnings
 from .config import GEMINI_API_KEY, DEFAULT_MODEL, FALLBACK_MODELS
+
+warnings.filterwarnings("ignore", message=".*non-text parts in the response.*")
 
 class GeminiClient:
     def __init__(self, api_key=None, model=None):
@@ -54,10 +57,18 @@ class GeminiClient:
                                 contents=prompt,
                                 config=config if config else None
                             )
-                            if hasattr(response, "text") and response.text:
+                            # Extract text directly from parts to avoid non-text warning
+                            text_out = None
+                            if hasattr(response, "candidates") and response.candidates:
+                                content = getattr(response.candidates[0], "content", None)
+                                if content and hasattr(content, "parts"):
+                                    text_out = "".join(getattr(p, "text", "") or "" for p in content.parts if getattr(p, "text", None))
+                            if not text_out and hasattr(response, "text"):
+                                text_out = response.text
+                            if text_out:
                                 self.model = model_name
                                 self.last_call_live = True
-                                return response.text
+                                return text_out
                         except Exception as m_err:
                             self.last_error = str(m_err)
                             continue

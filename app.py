@@ -24,28 +24,48 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling
+# Custom Dark Aurora Styling
 st.markdown("""
 <style>
+    /* Dark Theme Core Adjustments */
+    .stApp {
+        background-color: #0b0f19;
+        color: #f1f5f9;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
     .main-header {
-        font-size: 2.2rem;
+        font-size: 2.3rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
+        background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.2rem;
+        letter-spacing: -0.02em;
     }
     .sub-header {
-        font-size: 1.05rem;
-        color: #64748B;
-        margin-bottom: 1.5rem;
+        font-size: 1.0rem;
+        color: #94a3b8;
+        margin-bottom: 1.2rem;
+    }
+    .ui-notice {
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 12px;
+        padding: 10px 16px;
+        margin-bottom: 20px;
+        font-size: 0.88rem;
+        color: #cbd5e1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .metric-card {
-        background-color: #F8FAFC;
-        border: 1px solid #E2E8F0;
-        border-radius: 12px;
+        background-color: #131b2e;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
         padding: 16px;
         text-align: center;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
     }
     .bloom-pill {
         display: inline-block;
@@ -54,6 +74,22 @@ st.markdown("""
         font-size: 0.8rem;
         font-weight: 600;
         color: white;
+    }
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #111827;
+        padding: 4px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .stTabs [data-baseweb="tab"] {
+        color: #94a3b8;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #1e293b !important;
+        color: #818cf8 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -84,6 +120,12 @@ with st.sidebar:
 # Main Header
 st.markdown('<div class="main-header">🎓 EduGenie: Learning Assistant</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Google Gemini Powered Adaptive Learning • Bloom\'s Taxonomy Diagnostics • Smart Notes & Flashcards</div>', unsafe_allow_html=True)
+st.markdown('''
+<div class="ui-notice">
+    <span>✨</span>
+    <span><strong>Tip:</strong> You are in Streamlit Studio mode. For the animated dark Aurora Single Page Web Application with interactive tabs and MathJax, run <code>python3 server.py 8085</code> and open <a href="http://127.0.0.1:8085" target="_blank" style="color:#818cf8; text-decoration:underline; font-weight:600;">http://127.0.0.1:8085</a>.</span>
+</div>
+''', unsafe_allow_html=True)
 
 # Tabs
 tab_tutor, tab_quiz, tab_notes, tab_flashcards, tab_roadmap, tab_analytics = st.tabs([
@@ -325,10 +367,10 @@ with tab_analytics:
     for idx, item in enumerate(analytics["bloom_details"]):
         with b_cols[idx]:
             st.markdown(f"""
-            <div style="background-color:#F8FAFC; border: 1px solid #E2E8F0; border-radius:10px; padding:12px; text-align:center;">
+            <div style="background-color:#131b2e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius:12px; padding:14px; text-align:center; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
                 <div style="color:{item['color']}; font-weight:700; font-size:0.9rem;">{item['name']}</div>
-                <div style="font-size:1.4rem; font-weight:800; margin:6px 0;">{item['score_pct']}%</div>
-                <div style="font-size:0.75rem; color:#64748B;">{item['correct']}/{item['total']} correct</div>
-                <div style="font-size:0.75rem; font-weight:600; color:{'#10B981' if item['status']=='Mastered' else '#64748B'}">{item['status']}</div>
+                <div style="font-size:1.45rem; font-weight:800; margin:6px 0; color:#f8fafc;">{item['score_pct']}%</div>
+                <div style="font-size:0.75rem; color:#94a3b8;">{item['correct']}/{item['total']} correct</div>
+                <div style="font-size:0.75rem; font-weight:600; color:{'#34d399' if item['status']=='Mastered' else '#94a3b8'}">{item['status']}</div>
             </div>
             """, unsafe_allow_html=True)

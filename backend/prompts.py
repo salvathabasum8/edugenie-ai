@@ -5,14 +5,18 @@ def get_tutor_system_prompt(persona_key="socratic"):
     persona = TUTOR_PERSONAS.get(persona_key, TUTOR_PERSONAS["socratic"])
     return f"""You are EduGenie, an advanced AI Learning Assistant powered by Google Gemini.
 Your Persona: {persona['name']}
-Style Instruction: {persona['system_instruction']}
+Persona Focus: {persona['system_instruction']}
 
-Core Guidelines:
-1. Always be supportive, pedagogically sound, and engaging.
-2. Structure your answers with clear headings, bullet points, and code/math blocks where appropriate.
-3. Use LaTeX formatting for mathematical expressions: inline $...$ and display $$...$$.
-4. Whenever explaining a difficult concept, connect it to an intuitive real-world analogy.
-5. End your response with a quick 'Quick Check Question' or reflection prompt to verify student understanding.
+CRITICAL TEACHING GUIDELINES:
+1. DIRECT & EXACT ACCURACY: Always answer the student's question directly, clearly, and completely. Never dodge, answer in vague riddles, or withhold the correct answer.
+2. TECHNICAL & MATHEMATICAL DEPTH:
+   - For mathematical, algorithmic, or scientific questions, provide the exact mathematical formula ($...$ inline, $$...$$ display) and step-by-step update rules.
+   - For coding/debugging, provide working code snippets and explain exactly why the error occurs and how to fix it.
+   - For exam questions, provide a model answer with mark allocations and common traps.
+3. STRUCTURE & PEDAGOGY:
+   - Use structured Markdown with bold terms and clear sections.
+   - Connect difficult mechanisms to an intuitive mental model or real-world analogy.
+   - End with a single crisp 'Quick Recall Question' to test retention.
 """
 
 def get_quiz_prompt(topic, difficulty="intermediate", bloom_level="all", num_questions=5, context_text=None):
@@ -117,35 +121,52 @@ CRITICAL: Return ONLY valid JSON matching this schema:
 """
 
 def get_roadmap_prompt(goal, duration_days=14, weekly_hours=10):
-    return f"""You are EduGenie's Adaptive Learning Planner.
-Create a personalized, milestone-driven study roadmap for:
-Goal / Exam / Subject: "{goal}"
-Available Timeline: {duration_days} days
-Estimated Study Time: {weekly_hours} hours per week
+    p1_end = max(2, duration_days // 3)
+    p2_end = max(p1_end + 1, (2 * duration_days) // 3)
+    return f"""You are EduGenie's Fast Adaptive Learning Planner.
+Generate a structured, high-impact 3-phase study roadmap for: "{goal}".
+Timeline: {duration_days} days | Pacing: {weekly_hours} hrs/week.
 
-CRITICAL: Return ONLY valid JSON matching this exact schema:
+Keep milestones focused and concise so the plan generates rapidly.
+CRITICAL: Return ONLY valid JSON matching this schema:
 {{
-  "title": "{goal} Learning Roadmap",
+  "title": "{goal} Mastery Roadmap",
   "goal": "{goal}",
   "duration_days": {duration_days},
   "weekly_hours": {weekly_hours},
   "phases": [
     {{
       "phase_number": 1,
-      "phase_name": "Phase Name (e.g. Foundations & Core Mechanics)",
-      "days_range": "Days 1-4",
-      "key_objectives": ["Objective 1", "Objective 2"],
+      "phase_name": "Phase 1: Foundations & Core Mechanics",
+      "days_range": "Days 1-{p1_end}",
+      "key_objectives": ["Grasp fundamental principles", "Master core terminology & mental models"],
       "daily_milestones": [
-        {{
-          "day": 1,
-          "task": "Specific actionable learning task",
-          "checkpoint": "Practical milestone check",
-          "estimated_minutes": 90
-        }}
+        {{"day": 1, "task": "Core concepts deep-dive & terminology", "checkpoint": "Concept recall verification", "estimated_minutes": 60}},
+        {{"day": {p1_end}, "task": "Foundational exercises and problem drills", "checkpoint": "Solve 3 standard problems", "estimated_minutes": 60}}
+      ]
+    }},
+    {{
+      "phase_number": 2,
+      "phase_name": "Phase 2: Applied Practice & Problem Solving",
+      "days_range": "Days {p1_end + 1}-{p2_end}",
+      "key_objectives": ["Apply concepts to practical scenarios", "Deconstruct edge cases & traps"],
+      "daily_milestones": [
+        {{"day": {p1_end + 1}, "task": "Implement and analyze key algorithms/mechanisms", "checkpoint": "Working prototype/solution", "estimated_minutes": 75}},
+        {{"day": {p2_end}, "task": "High-yield exam traps and diagnostic drills", "checkpoint": "Score >= 80% on practice quiz", "estimated_minutes": 60}}
+      ]
+    }},
+    {{
+      "phase_number": 3,
+      "phase_name": "Phase 3: Synthesis, Mock Testing & Mastery",
+      "days_range": "Days {p2_end + 1}-{duration_days}",
+      "key_objectives": ["Full exam/project readiness", "Comprehensive recall review"],
+      "daily_milestones": [
+        {{"day": {p2_end + 1}, "task": "Full-length timed assessment or capstone build", "checkpoint": "Complete capstone challenge", "estimated_minutes": 90}},
+        {{"day": {duration_days}, "task": "Spaced repetition review of high-yield weak areas", "checkpoint": "Ready for test day", "estimated_minutes": 45}}
       ]
     }}
   ],
-  "capstone_challenge": "A culminating practical project or mock exam to prove mastery",
-  "expert_tips": ["Tip 1", "Tip 2"]
+  "capstone_challenge": "Build a practical synthesis artifact or score 90%+ on full mock exam in {goal}.",
+  "expert_tips": ["Use active recall rather than passive re-reading", "Explain core mechanisms aloud using Feynman technique"]
 }}
 """
