@@ -1,11 +1,13 @@
 # EduGenie AI: Dependencies
 # -------------------------------------------------------------
 # Zero-Dependency Note:
-# EduGenie AI is architected to run immediately out-of-the-box
-# with ZERO external packages using Python 3 standard library:
+# EduGenie AI runs out-of-the-box with ZERO external packages
+# using pure Python 3 standard library:
 #   python3 server.py
 #
-# Optional packages for live Google Gemini Cloud SDK & Streamlit UI:
-google-genai>=2.3.0
+# Packages for live Google Gemini Cloud SDK, Streamlit UI, and PDF reading:
+google-genai>=0.8.0,<2.0.0; python_version < '3.10'
+google-genai>=2.0.0; python_version >= '3.10'
 streamlit>=1.35.0
 pypdf>=3.17.0
+python-dotenv>=1.0.0

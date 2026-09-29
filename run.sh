@@ -4,6 +4,15 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+# Select python binary (prefer .venv if present)
+if [ -d "$DIR/.venv" ]; then
+  PYTHON="$DIR/.venv/bin/python"
+  STREAMLIT="$DIR/.venv/bin/streamlit"
+else
+  PYTHON="python3"
+  STREAMLIT="streamlit"
+fi
+
 MODE="${1:-server}"
 
 case "$MODE" in
@@ -11,8 +20,9 @@ case "$MODE" in
     echo "================================================================"
     echo " 🎓 Starting EduGenie AI (Full-Stack Web App)..."
     echo " 🌐 Web UI: http://127.0.0.1:8085"
+    echo " 🐍 Python: $PYTHON"
     echo "================================================================"
-    python3 server.py 8085
+    "$PYTHON" server.py 8085
     ;;
   tunnel)
     echo "================================================================"
@@ -24,10 +34,10 @@ case "$MODE" in
     echo "================================================================"
     echo " 🎓 Starting EduGenie AI (Streamlit App)..."
     echo "================================================================"
-    if command -v streamlit &> /dev/null; then
-      streamlit run app.py
+    if [ -x "$STREAMLIT" ] || command -v "$STREAMLIT" &> /dev/null; then
+      "$STREAMLIT" run app.py
     else
-      echo "Streamlit not found. Please install: pip install streamlit"
+      echo "Streamlit not found. Please install: pip install -r requirements.txt"
       echo "Or run the zero-dependency full-stack server instead: ./run.sh server"
       exit 1
     fi
@@ -36,8 +46,8 @@ case "$MODE" in
     echo "================================================================"
     echo " 🧪 Running EduGenie Test Suite..."
     echo "================================================================"
-    python3 tests/test_services.py
-    python3 tests/test_server.py
+    "$PYTHON" tests/test_services.py
+    "$PYTHON" tests/test_server.py
     echo "✅ All tests passed successfully!"
     ;;
   *)

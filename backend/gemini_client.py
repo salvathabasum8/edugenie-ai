@@ -35,9 +35,11 @@ class GeminiClient:
         self.last_error = None
 
         if self.has_api_key():
-            try:
-                # 1. Try google-genai SDK if available
-                if self.sdk_available:
+            models_to_try = [self.model] + [m for m in FALLBACK_MODELS if m != self.model]
+
+            # 1. Try google-genai SDK if available
+            if self.sdk_available:
+                try:
                     client = self.genai_sdk.Client(api_key=self.api_key)
                     config = {}
                     if system_instruction:
@@ -45,16 +47,25 @@ class GeminiClient:
                     if temperature is not None:
                         config["temperature"] = temperature
                         
-                    response = client.models.generate_content(
-                        model=self.model,
-                        contents=prompt,
-                        config=config if config else None
-                    )
-                    if hasattr(response, "text") and response.text:
-                        self.last_call_live = True
-                        return response.text
-                
-                # 2. Direct HTTP REST API via urllib
+                    for model_name in models_to_try:
+                        try:
+                            response = client.models.generate_content(
+                                model=model_name,
+                                contents=prompt,
+                                config=config if config else None
+                            )
+                            if hasattr(response, "text") and response.text:
+                                self.model = model_name
+                                self.last_call_live = True
+                                return response.text
+                        except Exception as m_err:
+                            self.last_error = str(m_err)
+                            continue
+                except Exception as sdk_err:
+                    self.last_error = str(sdk_err)
+
+            # 2. Direct HTTP REST API via urllib
+            try:
                 text = self._call_rest_api(prompt, system_instruction, temperature)
                 self.last_call_live = True
                 return text

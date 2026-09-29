@@ -7,20 +7,34 @@ FRONTEND_DIR = BASE_DIR / "frontend"
 DATA_DIR = BASE_DIR / "sample_data"
 DB_PATH = BASE_DIR / "edugenie.db"
 
+# Automatically load .env if present
+env_path = BASE_DIR / ".env"
+if env_path.exists():
+    try:
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip('"').strip("'")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+    except Exception:
+        pass
+
 # Server configuration
 DEFAULT_PORT = int(os.environ.get("PORT", 8085))
 DEFAULT_HOST = os.environ.get("HOST", "0.0.0.0")
 
 # Google Gemini API configuration
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
 FALLBACK_MODELS = [
-    "gemini-2.5-flash",
-    "gemini-1.5-flash",
-    "gemini-2.0-flash",
-    "gemini-3.8-flash",
     "gemini-flash-latest",
-    "gemini-1.5-pro"
+    "gemini-3.1-flash-lite",
+    "gemini-3.5-flash",
+    "gemini-3.8-flash",
+    "gemini-pro-latest"
 ]
 
 # Bloom's Revised Taxonomy levels
