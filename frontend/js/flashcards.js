@@ -83,16 +83,20 @@
   }
 
   function renderCurrentCard() {
+    const emptyEl = document.getElementById('flashcards-empty');
     if (!currentDeck || !currentDeck.cards || currentDeck.cards.length === 0) {
       if (cardViewer) cardViewer.classList.add('hidden');
+      if (emptyEl) emptyEl.classList.remove('hidden');
       return;
     }
 
     if (cardViewer) cardViewer.classList.remove('hidden');
+    if (emptyEl) emptyEl.classList.add('hidden');
     isFlipped = false;
     if (cardInner) cardInner.classList.remove('flipped');
     if (ratingControls) ratingControls.classList.add('hidden');
 
+    const total = currentDeck.cards.length;
     const card = currentDeck.cards[currentCardIndex];
     if (cardFrontText) cardFrontText.textContent = card.front;
     if (cardBackText) cardBackText.textContent = card.back;
@@ -103,8 +107,25 @@
       cardBloomTag.textContent = `Bloom: ${(card.bloom_level || 'concept').toUpperCase()}`;
     }
     if (cardCounter) {
-      cardCounter.textContent = `Card ${currentCardIndex + 1} of ${currentDeck.cards.length}`;
+      cardCounter.textContent = `Card ${currentCardIndex + 1} of ${total}`;
     }
+
+    const progressBar = document.getElementById('flashcards-progress-bar');
+    if (progressBar) {
+      const pct = Math.round(((currentCardIndex + 1) / total) * 100);
+      progressBar.style.width = `${pct}%`;
+    }
+  }
+
+  function shuffleDeck() {
+    if (!currentDeck || !currentDeck.cards || currentDeck.cards.length <= 1) return;
+    if (window.SoundFX) SoundFX.click();
+    for (let i = currentDeck.cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [currentDeck.cards[i], currentDeck.cards[j]] = [currentDeck.cards[j], currentDeck.cards[i]];
+    }
+    currentCardIndex = 0;
+    renderCurrentCard();
   }
 
   function flipCard() {
@@ -195,6 +216,9 @@
       handleRate(qualityMap[e.code]);
     }
   });
+
+  const shuffleBtn = document.getElementById('shuffle-deck-btn');
+  if (shuffleBtn) shuffleBtn.addEventListener('click', shuffleDeck);
 
   // Load initial decks
   loadDecks();

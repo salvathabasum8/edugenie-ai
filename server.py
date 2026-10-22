@@ -90,7 +90,7 @@ class EduGenieHandler(SimpleHTTPRequestHandler):
                 "app": "EduGenie AI: Learning Assistant",
                 "gemini_model": gemini_client.model,
                 "has_gemini_api_key": has_key,
-                "mode": "Live Google Gemini AI" if has_key else "Local Educational Simulator (Add API Key to activate live Gemini 3.8 Flash)",
+                "mode": f"Live Google Gemini AI ({gemini_client.model})" if has_key else "Local Educational Simulator",
                 "blooms_levels": BLOOMS_LEVELS,
                 "tutor_personas": TUTOR_PERSONAS
             })

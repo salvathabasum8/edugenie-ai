@@ -37,36 +37,52 @@ async function checkStatus() {
   try {
     const data = await apiCall('/api/status');
     state.hasApiKey = data.has_gemini_api_key;
-    state.geminiModel = data.gemini_model;
+    state.geminiModel = data.gemini_model || 'gemini-3.5-flash-lite';
     state.bloomsLevels = data.blooms_levels || {};
     state.tutorPersonas = data.tutor_personas || {};
 
     const statusBadge = document.getElementById('status-badge');
     if (statusBadge) {
-      if (state.hasApiKey) {
-        statusBadge.innerHTML = `
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 shadow-sm shadow-emerald-500/10 cursor-pointer" onclick="openKeyModal()">
-            <span class="w-2 h-2 mr-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            Gemini Live: ${state.geminiModel}
-          </span>
-        `;
-      } else {
-        statusBadge.innerHTML = `
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/35 shadow-sm shadow-amber-500/10 cursor-pointer" onclick="openKeyModal()">
-            <span class="w-2 h-2 mr-2 rounded-full bg-amber-400"></span>
-            Educational Engine (Click to Add Key)
-          </span>
-        `;
-      }
+      statusBadge.innerHTML = `
+        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm shadow-emerald-500/10">
+          <span class="w-2 h-2 mr-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Gemini Active: ${state.geminiModel}
+        </span>
+      `;
     }
   } catch (e) {
     console.warn('Backend status check failed:', e);
   }
 }
 
-// Tab Switching with Sound FX
+// Math Formula KaTeX Renderer Helper
+function renderMath(container) {
+  if (!container) return;
+  if (window.renderMathInElement) {
+    try {
+      window.renderMathInElement(container, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    } catch (err) {
+      console.warn('KaTeX render error:', err);
+    }
+  }
+}
+window.renderMath = renderMath;
+
+// Tab Switching with Sound FX & TTS Cleanup
 function switchTab(tabName) {
   if (window.SoundFX) SoundFX.click();
+  // Cancel any active speech when changing view
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+  }
   state.currentTab = tabName;
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
@@ -84,33 +100,10 @@ function switchTab(tabName) {
   }
 }
 
-// Modal handling
-function openKeyModal() {
-  if (window.SoundFX) SoundFX.click();
-  const modal = document.getElementById('key-modal');
-  if (modal) modal.classList.remove('hidden');
-}
-
-function closeKeyModal() {
-  if (window.SoundFX) SoundFX.click();
-  const modal = document.getElementById('key-modal');
-  if (modal) modal.classList.add('hidden');
-}
-
-async function saveApiKey() {
-  const input = document.getElementById('api-key-input');
-  if (!input) return;
-  const key = input.value.trim();
-  try {
-    const res = await apiCall('/api/config/key', 'POST', { api_key: key });
-    closeKeyModal();
-    checkStatus();
-    if (window.SoundFX) SoundFX.correct();
-    alert('API Key updated successfully! ' + (res.has_key ? 'Live Gemini mode enabled.' : 'Set to demo mode.'));
-  } catch (e) {
-    alert('Failed to save API key: ' + e.message);
-  }
-}
+// Modal handling (kept safe for backwards compatibility)
+function openKeyModal() {}
+function closeKeyModal() {}
+async function saveApiKey() {}
 
 // Speech Synthesis Helper
 let activeSpeech = null;

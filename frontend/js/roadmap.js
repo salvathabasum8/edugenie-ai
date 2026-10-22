@@ -5,9 +5,12 @@
   const hoursInput = document.getElementById('roadmap-hours-select');
   const genBtn = document.getElementById('generate-roadmap-btn');
   const roadmapViewer = document.getElementById('roadmap-viewer');
+  const copyBtn = document.getElementById('copy-roadmap-btn');
+  const downloadBtn = document.getElementById('download-roadmap-btn');
 
   let totalTasks = 0;
   let completedTasks = 0;
+  let currentRoadmapData = null;
 
   async function generateRoadmap() {
     if (window.SoundFX) SoundFX.click();
@@ -168,8 +171,73 @@
       `).join('');
     }
 
+    currentRoadmapData = data;
     updateRoadmapProgress();
+    roadmapViewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function formatRoadmapMarkdown(data) {
+    if (!data) return '';
+    let md = `# 🗺️ ${data.title || data.goal + ' Learning Roadmap'}\n\n`;
+    md += `*Goal: ${data.goal} | Timeline: ${data.duration_days} Days | Commitment: ~${data.weekly_hours} Hours/Week*\n\n---\n\n`;
+    
+    (data.phases || []).forEach(phase => {
+      md += `## 📍 ${phase.phase_name} (${phase.days_range})\n\n`;
+      if (phase.key_objectives && phase.key_objectives.length > 0) {
+        md += `### Key Objectives:\n`;
+        phase.key_objectives.forEach(obj => { md += `- 🎯 ${obj}\n`; });
+        md += `\n`;
+      }
+      if (phase.daily_milestones && phase.daily_milestones.length > 0) {
+        md += `### Milestones & Checkpoints:\n`;
+        phase.daily_milestones.forEach(m => {
+          md += `- [ ] **Day ${m.day}** (${m.estimated_minutes}m): ${m.task} *(Checkpoint: ${m.checkpoint})*\n`;
+        });
+        md += `\n`;
+      }
+    });
+
+    if (data.capstone_challenge) {
+      md += `## 🏆 Capstone Challenge\n${data.capstone_challenge}\n\n`;
+    }
+
+    if (data.expert_tips && data.expert_tips.length > 0) {
+      md += `## 💡 Expert Cognitive Retention Tips\n`;
+      data.expert_tips.forEach(tip => { md += `- ★ ${tip}\n`; });
+      md += `\n`;
+    }
+
+    return md;
   }
 
   if (genBtn) genBtn.addEventListener('click', generateRoadmap);
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      if (!currentRoadmapData) return;
+      if (window.SoundFX) SoundFX.click();
+      const md = formatRoadmapMarkdown(currentRoadmapData);
+      navigator.clipboard.writeText(md).then(() => {
+        const orig = copyBtn.innerHTML;
+        copyBtn.innerHTML = '✅ Copied!';
+        setTimeout(() => { copyBtn.innerHTML = orig; }, 2000);
+      });
+    });
+  }
+
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      if (!currentRoadmapData) return;
+      if (window.SoundFX) SoundFX.click();
+      const md = formatRoadmapMarkdown(currentRoadmapData);
+      const safeGoal = (currentRoadmapData.goal || 'study').replace(/\s+/g, '_').toLowerCase();
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${safeGoal}_roadmap.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
 })();

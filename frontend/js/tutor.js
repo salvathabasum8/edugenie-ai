@@ -47,9 +47,14 @@
         ${badgeHtml}
       </div>
       ${!isUser ? `
-        <button class="hover:text-indigo-300 tts-btn px-2 py-1 rounded bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition text-xs flex items-center gap-1" title="Read Aloud">
-          🔊 Listen
-        </button>
+        <div class="flex items-center gap-1.5">
+          <button class="hover:text-indigo-300 copy-msg-btn px-2 py-1 rounded bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition text-[11px] flex items-center gap-1" title="Copy Answer">
+            📋 Copy
+          </button>
+          <button class="hover:text-indigo-300 tts-btn px-2 py-1 rounded bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition text-[11px] flex items-center gap-1" title="Read Aloud">
+            🔊 Listen
+          </button>
+        </div>
       ` : ''}
     `;
 
@@ -64,6 +69,10 @@
       } else {
         contentDiv.innerHTML = text.replace(/\n/g, '<br/>');
       }
+      // Render KaTeX Math Formulas
+      if (window.renderMath) {
+        window.renderMath(contentDiv);
+      }
     }
 
     bubble.appendChild(header);
@@ -74,6 +83,20 @@
     // Enhance code blocks with copy buttons
     if (!isUser) {
       enhanceCodeBlocks(contentDiv);
+    }
+
+    // Copy message button handler
+    if (!isUser) {
+      const copyMsgBtn = header.querySelector('.copy-msg-btn');
+      if (copyMsgBtn) {
+        copyMsgBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(text).then(() => {
+            if (window.SoundFX) SoundFX.click();
+            copyMsgBtn.innerHTML = '✅ Copied';
+            setTimeout(() => { copyMsgBtn.innerHTML = '📋 Copy'; }, 2000);
+          });
+        });
+      }
     }
 
     // TTS click handler
@@ -190,8 +213,32 @@
       }
     });
   }
-  if (clearChatBtn) clearChatBtn.addEventListener('click', clearChat);
-  if (exportChatBtn) exportChatBtn.addEventListener('click', exportChatBtn);
+  if (clearChatBtn) clearChatBtn.addEventListener('click', () => {
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    clearChat();
+  });
+  if (exportChatBtn) exportChatBtn.addEventListener('click', exportTranscript);
+
+  // Persona Description Dynamic Update
+  const personaDescEl = document.getElementById('persona-description');
+  const personaDescriptions = {
+    socratic: 'Guides through thoughtful leading questions, intuitive real-world analogies, and step-by-step reasoning rather than giving away immediate answers.',
+    exam_coach: 'Focuses on high-yield formulas, common student mistakes, exam traps, time-saving heuristics, and concise revision summaries.',
+    eli5: 'Explains complex concepts using simple everyday analogies, visual thought experiments, and zero jargon. Suitable for complete beginners.',
+    academic: 'Provides mathematically rigorous explanations, formal definitions, proofs, structured theorems, and academic depth.'
+  };
+
+  if (personaSelect) {
+    personaSelect.addEventListener('change', () => {
+      if (window.SoundFX) SoundFX.click();
+      const val = personaSelect.value;
+      if (personaDescEl && personaDescriptions[val]) {
+        personaDescEl.textContent = personaDescriptions[val];
+      }
+    });
+  }
 
   // Quick Prompt Chips
   document.querySelectorAll('.prompt-chip').forEach(chip => {

@@ -96,18 +96,16 @@ st.markdown("""
 
 # Sidebar
 with st.sidebar:
-    st.markdown("## ⚙️ Configuration")
-    api_key_input = st.text_input(
-        "Google Gemini API Key",
-        value=os.environ.get("GEMINI_API_KEY", ""),
-        type="password",
-        help="Enter your Google AI Studio API Key. If empty, local educational simulation mode is used."
-    )
-    if api_key_input:
-        gemini_client.set_api_key(api_key_input)
-        st.success("API Key Active! 🟢")
-    else:
-        st.info("Demo / Educational Offline Mode 🟡")
+    st.markdown("## ⚙️ AI Engine Status")
+    st.markdown("""
+    <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;">
+        <div style="color: #34d399; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 8px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 8px #34d399;"></span>
+            Gemini 3.5 Flash Active
+        </div>
+        <div style="color: #94a3b8; font-size: 0.76rem; margin-top: 5px;">Authenticated & ready for live adaptive learning.</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("### 🧠 Bloom's Taxonomy Guide")

@@ -49,6 +49,9 @@
           notesBody.textContent = res.content;
         }
         enhanceCodeBlocks(notesBody);
+        if (window.renderMath) {
+          window.renderMath(notesBody);
+        }
       }
       if (window.SoundFX) SoundFX.correct();
     } catch (err) {

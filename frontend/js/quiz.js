@@ -155,10 +155,20 @@
 
       container.appendChild(qCard);
     });
+    if (window.renderMath) {
+      window.renderMath(container);
+    }
   }
 
   async function submitQuiz() {
     if (!activeQuiz) return;
+    const total = activeQuiz.questions.length;
+    const answered = Object.keys(userAnswers).length;
+    if (answered < total) {
+      if (!confirm(`You have answered ${answered} of ${total} questions. Do you want to submit now?`)) {
+        return;
+      }
+    }
     if (timerInterval) clearInterval(timerInterval);
 
     const submitBtn = document.getElementById('submit-quiz-btn');
@@ -254,7 +264,11 @@
         </div>
       `).join('');
       enhanceCodeBlocks(reviewContainer);
+      if (window.renderMath) {
+        window.renderMath(reviewContainer);
+      }
     }
+    quizResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function resetQuiz() {
@@ -262,6 +276,7 @@
     quizResults.classList.add('hidden');
     quizRunner.classList.add('hidden');
     quizSetup.classList.remove('hidden');
+    quizSetup.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   if (genBtn) genBtn.addEventListener('click', generateQuiz);
